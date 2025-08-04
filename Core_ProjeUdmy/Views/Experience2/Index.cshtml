@@ -1,0 +1,148 @@
+﻿@using EntityLayer.Concrete
+@model List<Experience>
+
+
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_NewAdminLayout.cshtml";
+}
+
+<div class="col-md-6">
+    <div class="p-2">
+        <button type="button" id="btngetlistall" class="btn btn-outline-primary">Verileri Getir</button>
+        <button type="button" id="btnadd" class="btn btn-outline-info">Kaydet</button>
+        <button type="button" id="btnId" class="btn btn-outline-warning">Id İle Getir</button>
+        <button type="button" id="btndelete" class="btn btn-outline-danger">Sil</button>
+        <button type="button" id="btnupdate" class="btn btn-outline-success">Güncelle</button>
+    </div>
+
+</div>
+<br />
+
+<div class="p-2" id="listexperience">
+
+   
+</div>
+<br />
+<div class="p-2" id="listbyidexperience">
+</div>
+<br />
+<div class="col-md-12">
+    <h5>Ekleme Paneli</h5>
+    <input type="text" class="form-control" id="inpname" placeholder="Ad" />
+    <br />
+    <input type="text" class="form-control" id="inpdate" placeholder="Tarih" />
+   <br />
+</div>
+<div class="col-md-12">
+    <h4>Id'ye Göre Getirme  Paneli</h4>
+    <input type="text" class="form-control" id="inpId" placeholder="Id Giriniz" />
+  
+
+</div>
+<div class="col-md-12">
+    <h4>Id'ye Göre Silme Paneli</h4>
+    <input type="text" class="form-control" id="inpexpId" placeholder="Id Giriniz" />
+
+
+</div>
+@section Scripts
+{
+    <script>
+        $("#btngetlistall").click(function () {
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "GET",
+                url: "/Experience2/ListExperience/",
+                success: function (funk) {
+                    let values = jQuery.parseJSON(funk);
+                    console.log(values);
+                    let htmlst = "<table class='table table-bordered'> <tr> <th>ID</th> <th>Başlık</th> <th>Tarih</th> </tr>";
+
+                    $.each(values, function(index, value) {
+                        htmlst += `<tr>
+                                     <td>${value.Id}</td>
+                                     <td>${value.Name}</td>
+                                     <td>${value.Date}</td>
+                                   </tr>`;
+                    });
+
+                    htmlst += "</table>";
+                    $("#listexperience").html(htmlst); 
+
+                },
+                error: function () {
+                    console.log("bir hata oluştu");
+                }
+            });
+        });
+        $("#btnadd").click(function()
+        
+        {  let values=
+            
+            {
+               Name:$("#inpname").val(),
+               Date:$("#inpdate").val()
+            };
+            $.ajax({
+                type:"Post",
+                url:"/Experience2/AddExperience",
+                data:values,
+                success:function(funk1)
+               
+                { let reslt=jQuery.parseJSON(funk1);
+                    alert (result.Name + "başarılı");
+                
+                }
+
+            });
+        
+        
+        });
+            $("#btnId").click(() => {
+            let id = $("#inpId").val();
+
+            $.ajax({
+                type: "GET",
+                url: "/Experience2/GetById",
+                data: { ExperienceID: id },
+                dataType: "json",
+                success: function(result) {
+                    console.log("Gelen veri:", result);
+                    let htmlstr = `
+                        <table class="table-hover">
+                            <tr><th>Deneyim ID</th><td>${result.ExperienceID}</td></tr>
+                            <tr><th>Deneyim Başlığı</th><td>${result.Name}</td></tr>
+                        </table>`;
+                    $("#listbyidexperience").html(htmlstr);
+                }
+            });
+        });
+
+        $("#btndelete").click(() => {
+            let id = $("#inpexpId").val();
+            $.ajax({
+
+                url:"/Experience2/DeleteExperience/"+id,
+                type:"POST",
+                contentType:"application/json",
+                dataType:"json",
+                success:function(funk3)
+                {
+                  loadData();
+                }
+            });
+
+         });
+
+
+     
+    </script>
+}
+
+                  
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
